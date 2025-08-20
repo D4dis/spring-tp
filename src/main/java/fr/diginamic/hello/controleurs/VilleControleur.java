@@ -11,6 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/villes")
 public class VilleControleur {
+
     @GetMapping
     public List<Ville> getVilles() {
         List<Ville> villes = new ArrayList<>();
