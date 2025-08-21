@@ -1,8 +1,10 @@
 package fr.diginamic.hello.controleurs;
 
 import fr.diginamic.hello.models.Ville;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -39,7 +41,10 @@ public class VilleControleur {
     }
 
     @PostMapping
-    public ResponseEntity<String> addVille(@RequestBody Ville nouvelleVille) {
+    public ResponseEntity<String> addVille(@Valid @RequestBody Ville nouvelleVille, BindingResult result) {
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body(result.getAllErrors().get(0).getDefaultMessage());
+        }
         for (Ville v : villes) {
             if (v.getNom().equalsIgnoreCase(nouvelleVille.getNom())) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La ville existe deja");
@@ -50,7 +55,10 @@ public class VilleControleur {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateVille(@PathVariable int id, @RequestBody Ville villeMaj) {
+    public ResponseEntity<String> updateVille(@PathVariable int id, @Valid @RequestBody Ville villeMaj, BindingResult result) {
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body(result.getAllErrors().get(0).getDefaultMessage());
+        }
         for (Ville v : villes) {
             if (v.getId() == id) {
                 v.setNom(villeMaj.getNom());
