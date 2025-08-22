@@ -1,43 +1,52 @@
 package fr.diginamic.hello.controleurs;
 
 import fr.diginamic.hello.models.Ville;
+import fr.diginamic.hello.services.VilleService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/villes")
 public class VilleControleur {
 
-    private List<Ville> villes = new ArrayList<>();
-    private int compteurId = 1;
-
-    public VilleControleur() {
-        villes.add(new Ville(compteurId++, "Paris", 2000000));
-        villes.add(new Ville(compteurId++, "Lyon", 500000));
-        villes.add(new Ville(compteurId++, "Marseille", 800000));
-        villes.add(new Ville(compteurId++, "Toulouse", 400000));
-        villes.add(new Ville(compteurId++, "Montpellier", 300000));
-    }
+    @Autowired
+    private VilleService villeService;
 
     @GetMapping
     public List<Ville> getVilles() {
-        return villes;
+        return villeService.extractVilles();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Ville> getVilleById(@PathVariable int id) {
-        for (Ville v : villes) {
-            if (v.getId() == id) {
-                return ResponseEntity.ok(v);
+        try {
+            Ville ville = villeService.extractVille(id);
+            if (ville != null) {
+                return ResponseEntity.ok(ville);
             }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    @GetMapping("/nom/{nom}")
+    public ResponseEntity<Ville> getVilleByName(@PathVariable String nom) {
+        try {
+            Ville ville = villeService.extractVille(nom);
+            if (ville != null) {
+                return ResponseEntity.ok(ville);
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PostMapping
@@ -45,13 +54,15 @@ public class VilleControleur {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getAllErrors().get(0).getDefaultMessage());
         }
-        for (Ville v : villes) {
-            if (v.getNom().equalsIgnoreCase(nouvelleVille.getNom())) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La ville existe deja");
-            }
+
+        try {
+            villeService.insertVille(nouvelleVille);
+            return ResponseEntity.ok("Ville insérée avec succès");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur interne du serveur");
         }
-        villes.add(nouvelleVille);
-        return ResponseEntity.ok("Ville inseree avec succes");
     }
 
     @PutMapping("/{id}")
@@ -59,29 +70,26 @@ public class VilleControleur {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getAllErrors().get(0).getDefaultMessage());
         }
-        for (Ville v : villes) {
-            if (v.getId() == id) {
-                v.setNom(villeMaj.getNom());
-                v.setNbHabitants(villeMaj.getNbHabitants());
-                return ResponseEntity.ok("Ville modifiee avec succes");
-            }
+
+        try {
+            villeService.modifierVille(id, villeMaj);
+            return ResponseEntity.ok("Ville modifiée avec succès");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur interne du serveur");
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ville introuvable");
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteVille(@PathVariable int id) {
-        boolean removed = false;
-        for (int i = 0; i < villes.size(); i++) {
-            if (villes.get(i).getId() == id) {
-                villes.remove(i);
-                removed = true;
-                break;
-            }
+        try {
+            villeService.supprimerVille(id);
+            return ResponseEntity.ok("Ville supprimée avec succès");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur interne du serveur");
         }
-        if (removed) {
-            return ResponseEntity.ok("Ville supprimee avec succes");
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ville introuvable");
     }
 }
