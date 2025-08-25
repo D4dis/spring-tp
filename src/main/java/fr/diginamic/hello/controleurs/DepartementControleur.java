@@ -1,5 +1,9 @@
 package fr.diginamic.hello.controleurs;
 
+import fr.diginamic.hello.dto.DepartementDto;
+import fr.diginamic.hello.dto.VilleDto;
+import fr.diginamic.hello.mappers.DepartementMapper;
+import fr.diginamic.hello.mappers.VilleMapper;
 import fr.diginamic.hello.models.Departement;
 import fr.diginamic.hello.models.Ville;
 import fr.diginamic.hello.services.DepartementService;
@@ -10,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/departements")
@@ -18,17 +23,25 @@ public class DepartementControleur {
     @Autowired
     private DepartementService departementService;
 
+    @Autowired
+    private DepartementMapper departementMapper;
+
+    @Autowired
+    private VilleMapper villeMapper;
+
     @GetMapping
-    public List<Departement> getDepartements() {
-        return departementService.extractDepartements();
+    public List<DepartementDto> getDepartements() {
+        return departementService.extractDepartements().stream()
+                .map(departementMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Departement> getDepartementById(@PathVariable int id) {
+    public ResponseEntity<DepartementDto> getDepartementById(@PathVariable int id) {
         try {
             Departement departement = departementService.extractDepartement(id);
             if (departement != null) {
-                return ResponseEntity.ok(departement);
+                return ResponseEntity.ok(departementMapper.toDto(departement));
             }
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
@@ -37,10 +50,13 @@ public class DepartementControleur {
     }
 
     @GetMapping("/{id}/top-villes/{n}")
-    public ResponseEntity<List<Ville>> getTopNVilles(@PathVariable int id, @PathVariable int n) {
+    public ResponseEntity<List<VilleDto>> getTopNVilles(@PathVariable int id, @PathVariable int n) {
         try {
             List<Ville> villes = departementService.getTopNVilles(id, n);
-            return ResponseEntity.ok(villes);
+            List<VilleDto> villeDtos = villes.stream()
+                    .map(villeMapper::toDto)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(villeDtos);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
@@ -49,13 +65,16 @@ public class DepartementControleur {
     }
 
     @GetMapping("/{id}/villes-population")
-    public ResponseEntity<List<Ville>> getVillesByPopulation(
+    public ResponseEntity<List<VilleDto>> getVillesByPopulation(
             @PathVariable int id,
             @RequestParam int minPop,
             @RequestParam int maxPop) {
         try {
             List<Ville> villes = departementService.getVillesByPopulation(id, minPop, maxPop);
-            return ResponseEntity.ok(villes);
+            List<VilleDto> villeDtos = villes.stream()
+                    .map(villeMapper::toDto)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(villeDtos);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
@@ -64,9 +83,11 @@ public class DepartementControleur {
     }
 
     @PostMapping
-    public ResponseEntity<String> addDepartement(@Valid @RequestBody Departement nouveau) {
+    public ResponseEntity<String> addDepartement(@Valid @RequestBody DepartementDto nouveau) {
         try {
-            departementService.insertDepartement(nouveau);
+
+            Departement departement = departementMapper.toEntity(nouveau);
+            departementService.insertDepartement(departement);
             return ResponseEntity.ok("Département inséré avec succès");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -76,9 +97,10 @@ public class DepartementControleur {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateDepartement(@PathVariable int id, @Valid @RequestBody Departement maj) {
+    public ResponseEntity<String> updateDepartement(@PathVariable int id, @Valid @RequestBody DepartementDto maj) {
         try {
-            departementService.modifierDepartement(id, maj);
+            Departement departement = departementMapper.toEntity(maj);
+            departementService.modifierDepartement(id, departement);
             return ResponseEntity.ok("Département modifié avec succès");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

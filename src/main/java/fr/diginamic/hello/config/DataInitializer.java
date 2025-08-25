@@ -26,26 +26,31 @@ public class DataInitializer {
         // Création des départements
         Departement paris = new Departement();
         paris.setNom("Paris");
+        paris.setCode(75);
         paris.setVilles(new ArrayList<>());
         departementService.insertDepartement(paris);
 
         Departement rhone = new Departement();
         rhone.setNom("Rhône");
+        rhone.setCode(69);
         rhone.setVilles(new ArrayList<>());
         departementService.insertDepartement(rhone);
 
         Departement bdr = new Departement();
         bdr.setNom("Bouches-du-Rhône");
+        bdr.setCode(13);
         bdr.setVilles(new ArrayList<>());
         departementService.insertDepartement(bdr);
 
         Departement hg = new Departement();
         hg.setNom("Haute-Garonne");
+        hg.setCode(31);
         hg.setVilles(new ArrayList<>());
         departementService.insertDepartement(hg);
 
         Departement herault = new Departement();
         herault.setNom("Hérault");
+        herault.setCode(34);
         herault.setVilles(new ArrayList<>());
         departementService.insertDepartement(herault);
 

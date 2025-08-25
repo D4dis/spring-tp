@@ -13,6 +13,8 @@ public class Departement {
 
     private String nom;
 
+    private int code;
+
     @OneToMany(mappedBy = "departement", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Ville> villes;
@@ -20,9 +22,10 @@ public class Departement {
     public Departement() {
     }
 
-    public Departement(int id, String nom, List<Ville> villes) {
+    public Departement(int id, String nom, int code, List<Ville> villes) {
         this.id = id;
         this.nom = nom;
+        this.code = code;
         this.villes = villes;
     }
 
@@ -40,6 +43,14 @@ public class Departement {
 
     public void setNom(String nom) {
         this.nom = nom;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
     }
 
     public List<Ville> getVilles() {
