@@ -4,13 +4,13 @@ public class VilleDto {
     private int id;
     private String nom;
     private int nbHabitants;
-    private int codeDepartement;
+    private String codeDepartement;
     private String nomDepartement;
 
     public VilleDto() {
     }
 
-    public VilleDto(int id, String nom, int nbHabitants, int codeDepartement, String nomDepartement) {
+    public VilleDto(int id, String nom, int nbHabitants, String codeDepartement, String nomDepartement) {
         this.id = id;
         this.nom = nom;
         this.nbHabitants = nbHabitants;
@@ -42,11 +42,11 @@ public class VilleDto {
         this.nbHabitants = nbHabitants;
     }
 
-    public int getCodeDepartement() {
+    public String getCodeDepartement() {
         return codeDepartement;
     }
 
-    public void setCodeDepartement(int codeDepartement) {
+    public void setCodeDepartement(String codeDepartement) {
         this.codeDepartement = codeDepartement;
     }
 

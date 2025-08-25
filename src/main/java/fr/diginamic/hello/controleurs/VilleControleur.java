@@ -57,6 +57,105 @@ public class VilleControleur {
         }
     }
 
+    @GetMapping("/recherche/prefixe")
+    public ResponseEntity<List<VilleDto>> getVillesStartingWith(@RequestParam String prefix) {
+        try {
+            List<Ville> villes = villeService.findVillesStartingWith(prefix);
+            List<VilleDto> villeDtos = villes.stream()
+                    .map(villeMapper::toDto)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(villeDtos);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/recherche/population/min")
+    public ResponseEntity<List<VilleDto>> getVillesWithPopulationGreaterThan(@RequestParam int min) {
+        try {
+            List<Ville> villes = villeService.findVillesWithPopulationGreaterThan(min);
+            List<VilleDto> villeDtos = villes.stream()
+                    .map(villeMapper::toDto)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(villeDtos);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/recherche/population/intervalle")
+    public ResponseEntity<List<VilleDto>> getVillesWithPopulationBetween(
+            @RequestParam int min,
+            @RequestParam int max) {
+        try {
+            List<Ville> villes = villeService.findVillesWithPopulationBetween(min, max);
+            List<VilleDto> villeDtos = villes.stream()
+                    .map(villeMapper::toDto)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(villeDtos);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/recherche/departement/{departementId}/population/min")
+    public ResponseEntity<List<VilleDto>> getVillesByDepartementWithPopulationGreaterThan(
+            @PathVariable int departementId,
+            @RequestParam int min) {
+        try {
+            List<Ville> villes = villeService.findVillesByDepartementWithPopulationGreaterThan(departementId, min);
+            List<VilleDto> villeDtos = villes.stream()
+                    .map(villeMapper::toDto)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(villeDtos);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/recherche/departement/{departementId}/population/intervalle")
+    public ResponseEntity<List<VilleDto>> getVillesByDepartementWithPopulationBetween(
+            @PathVariable int departementId,
+            @RequestParam int min,
+            @RequestParam int max) {
+        try {
+            List<Ville> villes = villeService.findVillesByDepartementWithPopulationBetween(departementId, min, max);
+            List<VilleDto> villeDtos = villes.stream()
+                    .map(villeMapper::toDto)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(villeDtos);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/recherche/departement/{departementId}/top")
+    public ResponseEntity<List<VilleDto>> getTopNVillesByDepartement(
+            @PathVariable int departementId,
+            @RequestParam int limit) {
+        try {
+            List<Ville> villes = villeService.findTopNVillesByDepartement(departementId, limit);
+            List<VilleDto> villeDtos = villes.stream()
+                    .map(villeMapper::toDto)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(villeDtos);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @PostMapping
     public ResponseEntity<String> addVille(@Valid @RequestBody VilleDto villeDto, BindingResult result) {
         if (result.hasErrors()) {

@@ -36,6 +36,13 @@ public class DepartementControleur {
                 .collect(Collectors.toList());
     }
 
+    @GetMapping("/with-villes")
+    public List<DepartementDto> getDepartementsWithVilles() {
+        return departementService.extractDepartementsWithVilles().stream()
+                .map(departementMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<DepartementDto> getDepartementById(@PathVariable int id) {
         try {
@@ -77,6 +84,19 @@ public class DepartementControleur {
             return ResponseEntity.ok(villeDtos);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/{id}/avec-villes")
+    public ResponseEntity<DepartementDto> getDepartementWithVillesById(@PathVariable int id) {
+        try {
+            Departement departement = departementService.extractDepartementWithVilles(id);
+            if (departement != null) {
+                return ResponseEntity.ok(departementMapper.toDto(departement));
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

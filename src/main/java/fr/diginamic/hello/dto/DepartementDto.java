@@ -4,7 +4,7 @@ import java.util.List;
 
 public class DepartementDto {
     private int id;
-    private int code;
+    private String code;
     private String nom;
     private int nbHabitants;
     private List<VilleDto> villes;
@@ -12,7 +12,7 @@ public class DepartementDto {
     public DepartementDto() {
     }
 
-    public DepartementDto(int id, int code, String nom, int nbHabitants, List<VilleDto> villes) {
+    public DepartementDto(int id, String  code, String nom, int nbHabitants, List<VilleDto> villes) {
         this.id = id;
         this.code = code;
         this.nom = nom;
@@ -28,11 +28,11 @@ public class DepartementDto {
         this.id = id;
     }
 
-    public int getCode() {
+    public String  getCode() {
         return code;
     }
 
-    public void setCode(int code) {
+    public void setCode(String  code) {
         this.code = code;
     }
 
